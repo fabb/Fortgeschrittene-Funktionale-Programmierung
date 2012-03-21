@@ -1,4 +1,4 @@
-module Assignment1 where
+module AufgabeFFP1 where
 
 -- Assignment 1.1
 {-

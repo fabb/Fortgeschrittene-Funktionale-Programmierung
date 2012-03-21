@@ -1,9 +1,9 @@
-module Assignment1_Test where
+module AufgabeFFP1_Test where
 
 --http://leiffrenzel.de/papers/getting-started-with-hunit.html
 
 import Test.HUnit
-import Assignment1
+import AufgabeFFP1
 
 
 cases1 = TestLabel "Assignment 1.1" $ TestList [
