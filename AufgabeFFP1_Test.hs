@@ -32,7 +32,7 @@ cases3 = TestLabel "Assignment 1.3" $ TestList [
   ,
   TestCase $ assertEqual "fibdiag 5" (fibdiag 5) ([1,3,1])
   ,
-  TestCase $ assertEqual "fibdiag 8" (fibdiag 5) ([1,6,10,4])
+  TestCase $ assertEqual "fibdiag 8" (fibdiag 8) ([1,6,10,4])
   
   ]
 
