@@ -10,8 +10,10 @@ stenkonstruktor “:” und arithmetischen Funktionen zu definieren).
 
 -- function description
 pof2s :: [Integer]
-pof2s = undefined
+pof2s = pof2s_ 1
 
+pof2s_ :: Integer -> [Integer]
+pof2s_ n = n : (pof2s_ (2*n))
 
 -- Assignment 1.2
 {-
@@ -32,7 +34,12 @@ tionen zu definieren).
 -}
 
 pd :: [[Integer]]
-pd = undefined
+pd = map pd_ [1..]
+
+pd_ :: Integer -> [Integer]
+pd_ n
+	| n == 1 = [1]
+	| otherwise = zipWith (+) (0 : (pd_ (n-1))) ((pd_ (n-1)) ++ [0])
 
 
 -- Assignment 1.3
@@ -54,7 +61,7 @@ fibdiag 8 ->> [1,6,10,4]
 -}
 
 fibdiag :: Integer -> [Integer]
-fibdiag = undefined
+fibdiag n = zipWith (!!) (reverse $ take (fromIntegral n) pd) [0..fromIntegral (n - 1) `div` 2]
 
 
 -- Assignment 1.4
@@ -65,7 +72,7 @@ fibdiags :: Integer -> [[Integer]]
 -}
 
 fibdiags :: [[Integer]]
-fibdiags = undefined
+fibdiags = map fibdiag [1..]
 
 
 -- Assignment 1.5
@@ -87,4 +94,4 @@ take 5 fibspd
 -}
 
 fibspd :: [Integer]
-fibspd = undefined
+fibspd = map sum fibdiags
