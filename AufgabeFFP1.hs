@@ -9,11 +9,10 @@ stenkonstruktor “:” und arithmetischen Funktionen zu definieren).
 -}
 
 -- function description
-pof2s :: [Integer]
-pof2s = pof2s_ 1
 
-pof2s_ :: Integer -> [Integer]
-pof2s_ n = n : (pof2s_ (2*n))
+pof2s :: [Integer]
+pof2s = 1 : map (*2) pof2s
+
 
 -- Assignment 1.2
 {-
