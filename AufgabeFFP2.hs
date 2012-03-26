@@ -86,7 +86,14 @@ den Implementierungen miteinander.
 
 -- plain f
 f :: Int -> Int -> Float
-f = undefined
+f z k = sum $ map (h (fromIntegral z)) [0..fromIntegral k]
+
+h :: Integer -> Integer -> Float
+h z i = (fromInteger (toPow z i)) / (fromInteger (factorial i))
+
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial i = i * factorial (i-1)
 
 toPow :: Integer -> Integer -> Integer
 toPow a 0 = 1
