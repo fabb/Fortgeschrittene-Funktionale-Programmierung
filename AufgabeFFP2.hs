@@ -101,7 +101,7 @@ toPow a b = a * toPow a (b-1)
 
 -- f using memo tables
 fMT :: Int -> Int -> Float
-fMT z k = sum $ map (hMT !! z !!) [0..k]
+fMT z k = sum $ map ((hMT !!) z !!) [0..k]
 
 hMT = [[hMod z i | i<-[0..]] | z<-[0..]]
 
