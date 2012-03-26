@@ -33,7 +33,7 @@ tionen zu definieren).
 -}
 
 pd :: [[Integer]]
-pd = pd4
+pd = pd2
 
 
 pd1 = map pd1_ [1..]
@@ -67,7 +67,7 @@ fibdiag 8 ->> [1,6,10,4]
 -}
 
 fibdiag :: Integer -> [Integer]
-fibdiag = fibdiag2
+fibdiag = fibdiag1
 
 fibdiag1 n = zipWith (!!) (reverse $ take (fromIntegral n) pd) [0..fromIntegral (n - 1) `div` 2]
 
