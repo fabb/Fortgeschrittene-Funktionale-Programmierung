@@ -33,7 +33,19 @@ tionen zu definieren).
 -}
 
 pd :: [[Integer]]
-pd = [1] : [zipWith (+) (0:x) (x++[0]) | x<-pd]
+pd = pd4
+
+
+pd1 = map pd1_ [1..]
+pd1_ n
+	| n == 1 = [1]
+	| otherwise = zipWith (+) (0 : (pd1_ (n-1))) ((pd1_ (n-1)) ++ [0])
+
+pd2 = [1] : zipWith (zipWith (+)) (map (0:) pd2) (map (++[0]) pd2)
+
+pd3 = [1] : map (\xs -> zipWith (+) (0:xs) (xs ++ [0])) pd3
+
+pd4 = [1] : [zipWith (+) (0:x) (x++[0]) | x<-pd]
 
 
 -- Assignment 1.3
@@ -55,7 +67,11 @@ fibdiag 8 ->> [1,6,10,4]
 -}
 
 fibdiag :: Integer -> [Integer]
-fibdiag n = zipWith (!!) (reverse $ take (fromIntegral n) pd) [0..fromIntegral (n - 1) `div` 2]
+fibdiag = fibdiag2
+
+fibdiag1 n = zipWith (!!) (reverse $ take (fromIntegral n) pd) [0..fromIntegral (n - 1) `div` 2]
+
+fibdiag2 n = [pd !! (fromIntegral n-1 - i) !! i | i <- [0..(fromIntegral n-1) `div` 2]]
 
 
 -- Assignment 1.4
