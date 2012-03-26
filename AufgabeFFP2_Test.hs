@@ -23,9 +23,9 @@ cases2 = TestLabel "Assignment 2.2" $ TestList [
   ,
   TestCase $ assertEqual "powFast 2" (powFast 1) (pow 1)
   ,
-  TestCase $ assertEqual "powFast 3" (powFast 64) (pow 64)
+  TestCase $ assertEqual "powFast 3" (powFast 16) (pow 16)
   ,
-  TestCase $ assertEqual "powFast 4" (map powFast [0..30]) (map pow [0..30])
+  TestCase $ assertEqual "powFast 4" (map powFast [0..16]) (map pow [0..16])
   
   ]
 
