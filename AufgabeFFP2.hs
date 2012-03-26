@@ -88,6 +88,10 @@ den Implementierungen miteinander.
 f :: Int -> Int -> Float
 f = undefined
 
+toPow :: Integer -> Integer -> Integer
+toPow a 0 = 1
+toPow a b = a * toPow a (b-1)
+
 -- f using memo tables
 fMT :: Int -> Int -> Float
 fMT = undefined
@@ -113,9 +117,14 @@ von 2, usw.
 
 -- goedel number calculator
 gz :: Integer -> Integer
-gz = undefined
+gz n
+	| n <= 0 = 0
+	| otherwise = foldl (*) 1 $ zipWith toPow primes $ decimals n
+
+decimals 0 = []
+decimals n = decimals (n `div ` 10) ++ [n `mod` 10]
 
 -- goedel number stream
 gzs :: [Integer]
-gzs = undefined
+gzs = map gz [1..]
 
