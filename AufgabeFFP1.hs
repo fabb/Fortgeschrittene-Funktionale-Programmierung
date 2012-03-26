@@ -33,12 +33,7 @@ tionen zu definieren).
 -}
 
 pd :: [[Integer]]
-pd = map pd_ [1..]
-
-pd_ :: Integer -> [Integer]
-pd_ n
-	| n == 1 = [1]
-	| otherwise = zipWith (+) (0 : (pd_ (n-1))) ((pd_ (n-1)) ++ [0])
+pd = [1] : [zipWith (+) (0:x) (x++[0]) | x<-pd]
 
 
 -- Assignment 1.3
