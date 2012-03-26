@@ -15,7 +15,11 @@ head (drop 30 pps) ->> (809,811)
 
 -- prime couples
 pps :: [(Integer,Integer)]
-pps = undefined
+pps = filter (\(x,y) -> x == y-2) $ zip primes $ tail primes
+
+-- primes with sieve of eratosthenes
+primes = sieve [2..]
+sieve (x:xs) = x : sieve [y | y <- xs, mod y x > 0]
 
 
 -- Assignment 2.2
