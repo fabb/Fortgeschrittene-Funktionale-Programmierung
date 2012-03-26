@@ -44,8 +44,10 @@ und powFast.
 
 -- fast power function using memo table
 powFast :: Int -> Integer
-powFast 0 = undefined
-powFast n = undefined
+powFast 0 = 1
+powFast n = powFastList !! (n-1) + powFastList !! (n-1)
+
+powFastList = [powFast x | x <- [0..]]
 
 -- plain power function not using memo table
 pow :: Int -> Integer
