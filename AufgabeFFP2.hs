@@ -103,6 +103,7 @@ toPow a b = a * toPow a (b-1)
 fMT :: Int -> Int -> Float
 fMT z k = sum $ map ((hMT !!) z !!) [0..k]
 
+hMT :: [[Float]]
 hMT = [[hMod z i | i<-[0..]] | z<-[0..]]
 
 hMod z i = (fromInteger (toPowMT !! z !! i)) / (fromInteger (factorialMT !! i))
