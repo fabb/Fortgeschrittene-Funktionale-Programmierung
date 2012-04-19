@@ -92,21 +92,24 @@ type MaxWeight = Weight -- Hoechstzulaessiges Rucksackgewicht
 -- Assignment 3.1.1
 
 generator :: Items -> Loads
-generator = undefined
+generator [] = [[]]
+generator (x:xs) = (map (x:) (generator xs)) ++ generator xs
 
 transformer :: Loads -> [LoadWghtVal]
-transformer = undefined
+transformer = map (\xs -> (xs, sum (map fst xs), sum (map snd xs)))
 
 filter :: MaxWeight -> [LoadWghtVal] -> [LoadWghtVal]
-filter = undefined
+filter maxweight = Prelude.filter (\(load,_,_) -> (not . null) load) . Prelude.filter (\(_,weight,_) -> weight <= maxweight)
 
 selector1 :: [LoadWghtVal] -> [LoadWghtVal]
-selector1 = undefined
+selector1 xs = Prelude.filter (\(_,_,value) -> value == maxval) xs
+	where maxval = maximum (map (\(_,_,value) -> value) xs)
 
 -- Assignment 3.1.2
  
 selector2 :: [LoadWghtVal] -> [LoadWghtVal]
-selector2 = undefined
+selector2 xs = Prelude.filter (\(_,weight,_) -> weight == minweight) $ selector1 xs
+	where minweight = minimum (map (\(_,weight,_) -> weight) (selector1 xs))
  
 
 
