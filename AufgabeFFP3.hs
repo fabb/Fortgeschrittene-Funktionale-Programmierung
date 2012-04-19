@@ -151,10 +151,32 @@ binom (n,k)
 -- Assignment 3.2.1
 
 binomS :: (Integer,Integer) -> Integer
-binomS = undefined
+binomS (n,k) = pd !! fromIntegral n !! fromIntegral k
+
+
+-- stream of pascal triangle from assignment 1
+pd :: [[Integer]]
+pd = pd2
+
+
+pd1 = map pd1_ [1..]
+pd1_ n
+	| n == 1 = [1]
+	| otherwise = zipWith (+) (0 : (pd1_ (n-1))) ((pd1_ (n-1)) ++ [0])
+
+pd2 = [1] : zipWith (zipWith (+)) (map (0:) pd2) (map (++[0]) pd2)
+
+pd3 = [1] : map (\xs -> zipWith (+) (0:xs) (xs ++ [0])) pd3
+
+pd4 = [1] : [zipWith (+) (0:x) (x++[0]) | x<-pd]
 
 
 -- Assignment 3.2.2
 
 binomM :: (Integer,Integer) -> Integer
-binomM = undefined
+binomM (n,k)
+	| k==0 || n==k = 1
+	| otherwise = binomMT !! (fromIntegral n-1) !! (fromIntegral k-1) + binomMT !! (fromIntegral n-1) !! fromIntegral k
+
+binomMT = [[binomM (n,k) | k <- [0..]] | n <- [0..]]
+
