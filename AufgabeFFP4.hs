@@ -1,6 +1,7 @@
 module AufgabeFFP4 where
 
 import Data.Ix
+import Array
 
 -- Assignment 4.1
 {-
@@ -145,7 +146,7 @@ compFib t i
 
 
 -- dynamic programming HOF from LVA
-dynamic :: (Ix coord) => (Table entry coord -> coord -> entry) -> (coord,coord) -> (Table entry coord)
+--dynamic :: (Ix coord) => (Table entry coord -> coord -> entry) -> (coord,coord) -> (Table entry coord)
 dynamic compute bnds = t
 	where t = newTable (map (\coord -> (coord,compute t coord)) (range bnds))
 
@@ -157,51 +158,44 @@ binom (n,k)
 
 
 
-{-
-module Stack (Stack,push,pop,top,emptyStack,stackEmpty) where
-
-push :: a -> Stack a -> Stack a
-pop :: Stack a -> Stack a
-top :: Stack a -> a
-emptyStack :: Stack a
-stackEmpty :: Stack a -> Bool
-
+--module Stack (Stack,push,pop,top,emptyStack,stackEmpty) where
 
 data Stack a = EmptyStk
 	| Stk a (Stack a)
 
+push :: a -> Stack a -> Stack a
 push x s = Stk x s
 
+pop :: Stack a -> Stack a
 pop EmptyStk = error "pop from an empty stack"
 pop (Stk _ s) = s
 
+top :: Stack a -> a
 top EmptyStk = error "top from an empty stack"
 top (Stk x _) = x
 
+emptyStack :: Stack a
 emptyStack = EmptyStk
 
+stackEmpty :: Stack a -> Bool
 stackEmpty EmptyStk = True
 stackEmpty _ = False
--}
 
-{-
-module Table (Table,newTable,findTable,updTable) where
 
-newTable :: (Ix b) => [(b,a)] -> Table a b
-findTable :: (Ix b) => Table a b -> b -> a
-updTable :: (Ix b) => (b,a) -> Table a b -> Table a b
+--module Table (Table,newTable,findTable,updTable) where
 
 newtype Table a b = Tbl (Array a b)
 
+--newTable :: (Ix b) => [(b,a)] -> Table a b
 newTable l = Tbl (array (lo,hi) l)
-	where indices = map fst l
+	where
+		indices = map fst l
+		lo = minimum indices
+		hi = maximum indices
 
-lo = minimum indices
-
-hi = maximum indices
-
+--findTable :: (Ix b) => Table a b -> b -> a
 findTable (Tbl a) i = a ! i
 
+--updTable :: (Ix b) => (b,a) -> Table a b -> Table a b
 updTable p@(i,x) (Tbl a) = Tbl (a // [p])
 
--}
