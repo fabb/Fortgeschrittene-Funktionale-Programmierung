@@ -146,7 +146,7 @@ compFib t i
 
 
 -- dynamic programming HOF from LVA
---dynamic :: (Ix coord) => (Table entry coord -> coord -> entry) -> (coord,coord) -> (Table entry coord)
+dynamic :: (Ix coord) => (Table entry coord -> coord -> entry) -> (coord,coord) -> (Table entry coord)
 dynamic compute bnds = t
 	where t = newTable (map (\coord -> (coord,compute t coord)) (range bnds))
 
@@ -184,18 +184,18 @@ stackEmpty _ = False
 
 --module Table (Table,newTable,findTable,updTable) where
 
-newtype Table a b = Tbl (Array a b)
+newtype Table a b = Tbl (Array b a)
 
---newTable :: (Ix b) => [(b,a)] -> Table a b
+newTable :: (Ix b) => [(b,a)] -> Table a b
 newTable l = Tbl (array (lo,hi) l)
 	where
 		indices = map fst l
 		lo = minimum indices
 		hi = maximum indices
 
---findTable :: (Ix b) => Table a b -> b -> a
+findTable :: (Ix b) => Table a b -> b -> a
 findTable (Tbl a) i = a ! i
 
---updTable :: (Ix b) => (b,a) -> Table a b -> Table a b
+updTable :: (Ix b) => (b,a) -> Table a b -> Table a b
 updTable p@(i,x) (Tbl a) = Tbl (a // [p])
 
