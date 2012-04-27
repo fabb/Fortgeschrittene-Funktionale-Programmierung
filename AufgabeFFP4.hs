@@ -134,23 +134,17 @@ von Aufgabenblatt 3 miteinander.
 -}
 
 binomDyn :: (Integer,Integer) -> Integer
-binomDyn (m,n) = undefined
---where ... dynamic compB... bndsB...
+binomDyn (n,k) = findTable t (n,k)
+	where t = dynamic compB (bndsB (n,k))
 
---bndsB :: Int -> (Int,Int)
-bndsB = undefined
+bndsB :: (Integer,Integer) -> ((Integer,Integer),(Integer,Integer))
+bndsB (n,k) = ((0,0),(n,k))
 
---compB :: Table Int Int -> Int -> Int
-compB = undefined
-
-{-
-bndsFibs :: Int -> (Int,Int)
-bndsFibs n = (0,n)
-compFib :: Table Int Int -> Int -> Int
-compFib t i
-| i <= 1 = i
-| otherwise = findTable t (i-1) + findTable t (i-2)
--}
+compB :: Table Integer (Integer,Integer) -> (Integer,Integer) -> Integer
+compB t (n,k)
+	| 0 < k && k < n = findTable t (n-1, k-1) + findTable t (n-1, k)
+	| k == 0 || k == n = 1
+	| otherwise = 0
 
 
 -- dynamic programming HOF from LVA
