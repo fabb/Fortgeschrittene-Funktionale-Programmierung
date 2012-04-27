@@ -1,5 +1,7 @@
 module AufgabeFFP4 where
 
+import Data.List
+import Data.Maybe
 import Data.Ix
 import Array
 
@@ -67,14 +69,20 @@ type SolKnp = [Object] -- Auswahl aus der Menge der anfaenglich gegebenen Gegens
 type NodeKnp = (Value,Weight,MaxWeight,[Object],SolKnp) -- wird ein Baum aufgebaut, dessen Knoten mit folgenden Informationen benannt sind: dem Wert und Gewicht des aktuellen Rucksackinhalts, dem nicht zu überschreitenden Höchstgewicht, der Liste der noch auswählbaren noch nicht eingepackten Gegenstände, sowie der Liste der bereits eingepackten Gegenstände.
 
 succKnp :: NodeKnp -> [NodeKnp]
-succKnp (v,w,limit,objects,psol) = undefined
+succKnp (v,w,limit,objects,psol) = (map (\o@(wo, vo) -> (v+vo, w+wo, limit, delete o objects, o:psol)) . filter (\(wo, _) -> w + wo <= limit)) objects
 
 goalKnp :: NodeKnp -> Bool
-goalKnp (_,w,limit,((w',_):_),_) = undefined
+goalKnp (_,_,_,[],_) = True
+--goalKnp (_,w,limit,((w',_):_),_) = w + w' > limit
+goalKnp (_,w,limit,objs,_) = all (\(w',_) -> w + w' > limit) objs
 
 knapsack :: Objects -> MaxWeight -> (SolKnp,Value)
-knapsack objects limit = undefined
-	--where ... = ... searchDfs ...
+knapsack objects limit = (maxsol, maxval)
+	where
+		solutions = searchDfs succKnp goalKnp (0, 0, limit, objects, [])
+		maxval = maximum (0:(map (\(value,_,_,_,_) -> value) solutions))
+		--maxsols = filter (\(value,_,_,_,_) -> value == maxval) solutions
+		maxsol = (maybe [] (\(_,_,_,_,sol) -> sol) . find (\(value,_,_,_,_) -> value == maxval)) solutions
 
 
 -- backtracking HOF from LVA
