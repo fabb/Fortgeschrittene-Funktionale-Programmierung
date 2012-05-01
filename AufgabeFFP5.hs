@@ -127,8 +127,25 @@ Elementwert.
 
 -- function description
 minIndex :: (Ix a, Show a) => Array a b -> (b -> Bool) -> a
-minIndex a f = fromMaybe (error "No matching index") (minIndex' a f)
+minIndex a f = fst $ fromMaybe (error "No matching index") (minIndex' a f)
 
 -- for testability we don't use error
-minIndex' :: (Ix a, Show a) => Array a b -> (b -> Bool) -> Maybe a
-minIndex' = undefined
+minIndex' :: (Ix a, Show a) => Array a b -> (b -> Bool) -> Maybe (a,b)
+minIndex' a f = divideAndConquer mi_indiv (mi_solve f) mi_divide mi_combine $ assocs a
+	where
+		mi_indiv :: [(a,b)] -> Bool
+		mi_indiv ls = length ls <= 1
+		mi_solve :: ((b -> Bool)) -> [(a,b)] -> Maybe (a,b)
+		mi_solve f = listToMaybe . filter (f . snd)
+		mi_divide :: [(a,b)] -> [[(a,b)]]
+		mi_divide (l:ls) = [[l],ls]
+		mi_combine :: [(a,b)] -> [Maybe (a,b)] -> Maybe (a,b)
+		mi_combine _ ls = (listToMaybe . catMaybes) ls
+
+divideAndConquer :: (p -> Bool) -> (p -> s) -> (p -> [p]) -> (p -> [s] -> s) -> p -> s
+divideAndConquer indiv solve divide combine initPb
+	= dAC initPb
+		where
+			dAC pb
+				| indiv pb = solve pb
+				| otherwise = combine pb (map dAC (divide pb))
