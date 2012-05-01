@@ -1,9 +1,11 @@
 module AufgabeFFP5 where
 
 import Data.Maybe
+import Data.List
 import Data.Ix
 import Array
 
+-- Assignment 5
 {-
 Seien low und high ganze Zahlen mit low = high und sei a ein eindimensionales
 Feld mit kleinstem Index low und größtem Index high. Seien weiter i und j ganze
@@ -22,6 +24,16 @@ a ? [4,7] ist: 9 + 2 + (-1) + 2 = 12
 a ? [3,8] ist: 0 + 9 + 2 + (-1) + 2 + (-5) = 7
 -}
 
+sections :: Ix a => Array a b -> [(a,a)]
+sections a = [(x,y) | x <- ind, y <- ind, x<=y]
+	where ind = indices a
+
+sectionSum :: (Ix a, Num b) => Array a b -> (a,a) -> b
+sectionSum a sec = sum $ map (a !) $ range sec
+
+sectionSums :: (Ix a, Num b) => Array a b -> [((a,a),b)]
+sectionSums a = map (\ind -> (ind,sectionSum a ind)) $ sections a
+
 -- Assignment 5.1
 {-
 Schreiben Sie eine Haskell-Rechenvorschrift mas :: Array Int Int -> Int,
@@ -34,7 +46,7 @@ mas a ->> 12
 
 -- maximaler wert der abschnittsummen
 mas :: Array Int Int -> Int
-mas = undefined
+mas a = maximum $ map snd $ sectionSums a
 
 
 -- Assignment 5.2
@@ -58,7 +70,10 @@ amas b ->> [(1,7),(1,8),(4,7),(4,8)]
 -- liste der abschnitte mit maximaler abschnittsumme
 -- sortiert zuerst nach anfangsindex und dann nach endindex
 amas :: Array Int Int -> [(Int,Int)]
-amas = undefined
+amas a = map fst $ amas2 a
+
+amas2 :: Array Int Int -> [((Int,Int),Int)]
+amas2 a = filter (\(_,s) -> s == mas a) $ sectionSums a
 
 
 -- Assignment 5.3
@@ -80,7 +95,11 @@ finiertem” Elementwert.
 -- längster abschnitt mit maximaler abschnittsumme
 -- mehrere -> kleinster anfangsindex
 lmas :: Array Int Int -> (Int,Int)
-lmas = undefined
+lmas a = fst $ maximumBy sectionLength $ amas2 a
+	where
+		sectionLength ((il1,ih1),_) ((il2,ih2),_)
+			| ih1 - il1 >= ih2 - il2 = GT -- >= guarantees that the first biggest is taken
+			| otherwise = LT
 
 
 -- Assignment 5.4
