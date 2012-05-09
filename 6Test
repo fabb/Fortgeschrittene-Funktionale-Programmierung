@@ -1,0 +1,8 @@
+#! /usr/local/bin/runhugs +l
+
+> module Main where
+
+> import AufgabeFFP5_Test
+
+> main = do
+>   AufgabeFFP5_Test.main
