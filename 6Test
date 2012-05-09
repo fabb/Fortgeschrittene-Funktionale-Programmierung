@@ -2,7 +2,7 @@
 
 > module Main where
 
-> import AufgabeFFP5_Test
+> import AufgabeFFP6_Test
 
 > main = do
->   AufgabeFFP5_Test.main
+>   AufgabeFFP6_Test.main
