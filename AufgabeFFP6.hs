@@ -89,7 +89,10 @@ conv Div = div
 
 
 yield :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield a i = map (amap conv) $ yield' a i
+yield a i = map convArithArr $ yield' a i
+
+convArithArr :: Array Int ArithOp -> Array Int (Int->Int->Int)
+convArithArr = amap conv
 
 yield' :: Array Int Int -> Int -> [Array Int ArithOp]
 yield' = yield'_bt
@@ -106,7 +109,7 @@ type NodeY = (CurrentValue,TargetValue,Operations,SeriesOfNumbers,SolY)
 
 
 yield_bt :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_bt a i = map (amap conv) $ yield'_bt a i
+yield_bt a i = map convArithArr $ yield'_bt a i
 
 yield'_bt :: Array Int Int -> Int -> [Array Int ArithOp]
 yield'_bt a sval = map (\xs -> listArray (1, length xs) xs) solution
@@ -169,16 +172,24 @@ stackEmpty _ = False
 ----
 
 yield_gtf :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_gtf a i = map (amap conv) $ yield'_gtf a i
+yield_gtf a i = map convArithArr $ yield'_gtf a i
 
 yield'_gtf :: Array Int Int -> Int -> [Array Int ArithOp]
-yield'_gtf = filt . transform . generate
+yield'_gtf a n = filt a n $ transform $ generate [Plus, Minus, Times, Div] len
+	where
+		(from,to) = bounds a
+		len = to - from
 
 
+filt :: Array Int Int -> Int -> [Array Int ArithOp] -> [Array Int ArithOp]
+filt a n = filter (\opa -> eval a (convArithArr opa) == n)
 
-filt = undefined
-transform = undefined
-generate = undefined
+transform :: [[ArithOp]] -> [Array Int ArithOp]
+transform = map (\xs -> listArray (1, length xs) xs)
+
+generate :: [ArithOp] -> Int -> [[ArithOp]]
+generate _ 0 = [[]]
+generate ops len = concat $ map (\x -> map (:x) ops) $ generate ops (len-1)
 
 
 -- Assignment 6.3
