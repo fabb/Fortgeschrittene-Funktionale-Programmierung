@@ -75,7 +75,7 @@ fen.)
 -}
 
 -- TODO noch nicht abgesegnet
-data ArithOp = Plus | Minus | Times | Div
+data ArithOp = Plus | Minus | Times | Div deriving (Eq, Show)
 
 conv :: ArithOp -> (Int->Int->Int)
 conv Plus = (+)
@@ -83,19 +83,94 @@ conv Minus = (-)
 conv Times = (*)
 conv Div = div
 
-bla a = amap conv a
-
 
 yield :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield = undefined
+yield a i = map (amap conv) $ yield' a i
+
+yield' :: Array Int Int -> Int -> [Array Int ArithOp]
+yield' = yield'_bt
+
+
+----
+
+type CurrentValue = Int -- current calculation value
+type TargetValue = Int -- current calculation value
+type Operations = [ArithOp] -- allowed operations
+type SeriesOfNumbers = [Int] -- rest of the input number sequence
+type SolY = [ArithOp] -- solution is sequence of operations
+type NodeY = (CurrentValue,TargetValue,Operations,SeriesOfNumbers,SolY)
 
 
 yield_bt :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_bt = undefined
+yield_bt a i = map (amap conv) $ yield'_bt a i
 
+yield'_bt :: Array Int Int -> Int -> [Array Int ArithOp]
+yield'_bt a sval = map (\xs -> listArray (1, length xs) xs) solution
+	where
+		aElems = elems a
+		solutionNodes = searchDfs succY goalY (head aElems, sval, [Plus, Minus, Times, Div], tail aElems, [])
+		solution = map (\(_,_,_,_,psol) -> psol) solutionNodes
+
+succY :: NodeY -> [NodeY]
+succY (_,_,_,[],_) = []
+succY (v,sv,os,ss,psol) = map (\arith -> ((conv arith) v (head ss), sv, os, tail ss, psol ++ [arith])) os'
+	where
+		os'
+			| head ss == 0 = take 3 os -- workaround to avoid division by 0
+			| otherwise = os
+
+goalY :: NodeY -> Bool
+goalY (v,sv,_,[],_)
+	| v == sv = True
+	| otherwise = False
+goalY _ = False
+
+-- backtracking HOF from LVA
+searchDfs :: (Eq node) => (node -> [node]) -> (node -> Bool) -> node -> [node]
+searchDfs succ goal x = (search' (push x emptyStack) )
+	where
+		search' s
+			| stackEmpty s = []
+			| goal (top s) = top s : search' (pop s)
+			| otherwise
+				= let x = top s
+					in search' (foldr push (pop s) (succ x))
+
+
+
+
+--module Stack (Stack,push,pop,top,emptyStack,stackEmpty) where
+
+data Stack a = EmptyStk
+	| Stk a (Stack a)
+
+push :: a -> Stack a -> Stack a
+push x s = Stk x s
+
+pop :: Stack a -> Stack a
+pop EmptyStk = error "pop from an empty stack"
+pop (Stk _ s) = s
+
+top :: Stack a -> a
+top EmptyStk = error "top from an empty stack"
+top (Stk x _) = x
+
+emptyStack :: Stack a
+emptyStack = EmptyStk
+
+stackEmpty :: Stack a -> Bool
+stackEmpty EmptyStk = True
+stackEmpty _ = False
+
+----
 
 yield_gtf :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_gtf = filt . transform . generate
+yield_gtf a i = map (amap conv) $ yield'_gtf a i
+
+yield'_gtf :: Array Int Int -> Int -> [Array Int ArithOp]
+yield'_gtf = filt . transform . generate
+
+
 
 filt = undefined
 transform = undefined
@@ -117,4 +192,3 @@ instance Show (Array Int (Int->Int->Int)) where
 	show = undefined
 -}
 
-	
