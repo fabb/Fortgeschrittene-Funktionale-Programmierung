@@ -37,7 +37,11 @@ folgen angewendet.
 -}
 
 eval :: Array Int Int -> Array Int (Int->Int->Int) -> Int
-eval = undefined
+eval nums ops = eval' (elems nums) (elems ops)
+
+eval' :: [Int] -> [Int->Int->Int] -> Int
+eval' (n:nums) ops = foldl (\num op -> op num) n $ zipWith (\op num -> (`op` num)) ops nums
+eval' [] _ = 0
 
 
 -- Assignment 6.2
