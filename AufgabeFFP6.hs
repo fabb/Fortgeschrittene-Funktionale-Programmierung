@@ -75,7 +75,7 @@ fen.)
 -}
 
 -- TODO noch nicht abgesegnet
-data ArithOp = Plus | Minus | Times | Div
+data ArithOp = Plus | Minus | Times | Div deriving (Eq, Show)
 
 conv :: ArithOp -> (Int->Int->Int)
 conv Plus = (+)
@@ -83,19 +83,32 @@ conv Minus = (-)
 conv Times = (*)
 conv Div = div
 
-bla a = amap conv a
+bla a i = map (amap conv) $ f a i
+
+f = undefined
 
 
 yield :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield = undefined
+yield a i = map (amap conv) $ yield' a i
+
+yield' :: Array Int Int -> Int -> [Array Int ArithOp]
+yield' = yield'_bt
 
 
 yield_bt :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_bt = undefined
+yield_bt a i = map (amap conv) $ yield'_bt a i
+
+yield'_bt :: Array Int Int -> Int -> [Array Int ArithOp]
+yield'_bt = undefined
 
 
 yield_gtf :: Array Int Int -> Int -> [Array Int (Int->Int->Int)]
-yield_gtf = filt . transform . generate
+yield_gtf a i = map (amap conv) $ yield'_gtf a i
+
+yield'_gtf :: Array Int Int -> Int -> [Array Int ArithOp]
+yield'_gtf = filt . transform . generate
+
+
 
 filt = undefined
 transform = undefined
