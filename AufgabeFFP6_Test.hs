@@ -32,17 +32,23 @@ cases2 = TestLabel "Assignment 6.2" $ TestList [
   ,
   TestCase $ assertEqual "yield'" ([array (1,2) [(1,Plus),(2,Minus)], array (1,2) [(1,Div),(2,Times)], array (1,2) [(1,Div),(2,Div)]]) (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 0)
   ,
+  TestCase $ assertEqual "yield' div 0" ([array (1,1) [(1,Plus)], array (1,1) [(1,Minus)]]) (yield' (array (1,2) [(1,1),(2,0)]) 1)
+  ,
   TestCase $ assertEqual "yield'_bt" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 6) (yield'_bt (array (1,3) [(1,1),(2,2),(3,3)]) 6)
   ,
   TestCase $ assertEqual "yield'_bt" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 4) (yield'_bt (array (1,3) [(1,1),(2,2),(3,3)]) 4)
   ,
   TestCase $ assertEqual "yield'_bt" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 0) (yield'_bt (array (1,3) [(1,1),(2,2),(3,3)]) 0)
   ,
+  TestCase $ assertEqual "yield'_bt div 0" ([array (1,1) [(1,Plus)], array (1,1) [(1,Minus)]]) (yield'_gtf (array (1,2) [(1,1),(2,0)]) 1)
+  ,
   TestCase $ assertEqual "yield'_gtf" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 6) (yield'_gtf (array (1,3) [(1,1),(2,2),(3,3)]) 6)
   ,
   TestCase $ assertEqual "yield'_gtf" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 4) (yield'_gtf (array (1,3) [(1,1),(2,2),(3,3)]) 4)
   ,
   TestCase $ assertEqual "yield'_gtf" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 0) (yield'_gtf (array (1,3) [(1,1),(2,2),(3,3)]) 0)
+  ,
+  TestCase $ assertEqual "yield'_gtf div 0" ([array (1,1) [(1,Plus)], array (1,1) [(1,Minus)]]) (yield'_gtf (array (1,2) [(1,1),(2,0)]) 1)
   ,
   TestCase $ assertEqual "yield" ([6,6]) (map (eval (array (1,3) [(1,1),(2,2),(3,3)])) (yield (array (1,3) [(1,1),(2,2),(3,3)]) 6))
   ,
