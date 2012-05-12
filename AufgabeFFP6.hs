@@ -81,7 +81,7 @@ fen.)
 -}
 
 -- TODO noch nicht abgesegnet
-data ArithOp = Plus | Minus | Times | Div deriving (Eq, Show)
+data ArithOp = Plus | Minus | Times | Div deriving (Eq, Show, Ord)
 
 conv :: ArithOp -> (Int->Int->Int)
 conv Plus = (+)
@@ -209,7 +209,7 @@ instance Show (Int->Int->Int) where
 		| op 3 3 == 6 = "plus"
 		| op 3 3 == 0 = "minus"
 		| op 3 3 == 9 = "times"
-		| op 3 3 == 1 = "divide"
+		| op 3 3 == 1 = "div"
 		| otherwise = "undefined"
 
 
