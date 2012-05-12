@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module AufgabeFFP6 where
 
 import Data.List
@@ -202,8 +204,12 @@ dargestellt werden. Für mögliche andere Operationen wird keine besondere Aus-
 gabe verlangt.
 -}
 
-{-
-instance Show (Array Int (Int->Int->Int)) where
-	show = undefined
--}
+instance Show (Int->Int->Int) where
+	show  op
+		| op 3 3 == 6 = "plus"
+		| op 3 3 == 0 = "minus"
+		| op 3 3 == 9 = "times"
+		| op 3 3 == 1 = "divide"
+		| otherwise = "undefined"
+
 
