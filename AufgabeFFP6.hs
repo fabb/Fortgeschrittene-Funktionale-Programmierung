@@ -184,7 +184,11 @@ yield'_gtf a n = filt a n $ transform $ generate [Plus, Minus, Times, Div] len
 
 
 filt :: Array Int Int -> Int -> [Array Int ArithOp] -> [Array Int ArithOp]
-filt a n = filter (\opa -> eval a (convArithArr opa) == n)
+filt a n = filter leadsToNumber
+	where
+		leadsToNumber opa
+			| any (\(num,op) -> num == 0 && op == Div) (zip (tail (elems a)) (elems opa)) = False -- workaround for avoiding division by 0
+			| otherwise = eval a (convArithArr opa) == n
 
 transform :: [[ArithOp]] -> [Array Int ArithOp]
 transform = map (\xs -> listArray (1, length xs) xs)

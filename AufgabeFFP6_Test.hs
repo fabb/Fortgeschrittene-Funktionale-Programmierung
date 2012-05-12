@@ -54,7 +54,7 @@ cases2 = TestLabel "Assignment 6.2" $ TestList [
   ,
   TestCase $ assertListsUnorderedEqual "yield'_bt" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 0) (yield'_bt (array (1,3) [(1,1),(2,2),(3,3)]) 0)
   ,
-  TestCase $ assertListsUnorderedEqual "yield'_bt div 0" ([array (1,1) [(1,Plus)], array (1,1) [(1,Minus)]]) (yield'_gtf (array (1,2) [(1,1),(2,0)]) 1)
+  TestCase $ assertListsUnorderedEqual "yield'_bt div 0" ([array (1,1) [(1,Plus)], array (1,1) [(1,Minus)]]) (yield'_bt (array (1,2) [(1,1),(2,0)]) 1)
   ,
   TestCase $ assertListsUnorderedEqual "yield'_gtf" (yield' (array (1,3) [(1,1),(2,2),(3,3)]) 6) (yield'_gtf (array (1,3) [(1,1),(2,2),(3,3)]) 6)
   ,
