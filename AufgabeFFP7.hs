@@ -56,25 +56,25 @@ konventionen aus dem Beispiel über Schlangen aus der Vorlesung.
 type Buffer = (Int,String)
 
 empty :: Buffer -- the empty buffer
-empty = undefined
+empty = (0,"")
 
 insert :: Char -> Buffer -> Buffer -- insert character before cursor
-insert = undefined
+insert c b@(p,s) = (p+1, take p s ++ [c] ++ drop p s)
 
 delete :: Buffer -> Buffer -- delete character before cursor
-delete = undefined
+delete b@(p,s) = if atLeft b then b else (p-1, take (p-1) s ++ drop p s)
 
 left :: Buffer -> Buffer -- move cursor left one character
-left = undefined
+left b@(p,s) = if atLeft b then b else (p-1,s)
 
 right :: Buffer -> Buffer -- move cursor right one character
-right = undefined
+right b@(p,s) = if atRight b then b else (p+1,s)
 
 atLeft :: Buffer -> Bool -- is cursor at left end?
-atLeft = undefined
+atLeft (p,_) = p == 0
 
 atRight :: Buffer -> Bool -- is cursor at right end?
-atRight = undefined
+atRight (p,s) = p == length s -- cursor is AFTER last char
 
 
 -- Implementierung 2
