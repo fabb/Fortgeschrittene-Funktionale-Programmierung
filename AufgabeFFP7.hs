@@ -157,7 +157,7 @@ ssfn :: [Nat] -> Nat
 ssfn = (sap 0) . removeDuplicates . quickSort
 
 removeDuplicates :: Eq a => [a] -> [a]
-removeDuplicates = nub
+removeDuplicates = nub -- inefficient as we don't use knowledge that list is already sorted
 
 -- quickSort from lecture
 quickSort :: Ord a => [a] -> [a]
@@ -179,7 +179,7 @@ divideAndConquer indiv solve divide combine initPb
 
 -- sap from lecture
 sap :: Nat -> [Nat] -> Nat
-sap n [] = 0
+sap n [] = n
 sap n (x:xs)
 	| n /= x = n
 	| otherwise = sap (n+1) xs
@@ -201,4 +201,7 @@ prop_ssfn_eq_minfree_a nl = ssfn nl == minfree nl
 
 -- Für die Eigenschaft prop ssfn eq minfree b soll durch eine geeignete Vorbedingung sichergestellt werden, dass negative Listenelemente enthaltende automatisch generierte Testfälle verworfen und nicht als gültiger Testfall behandelt werden.
 prop_ssfn_eq_minfree_b :: [Nat] -> Property
-prop_ssfn_eq_minfree_b nl = undefined
+prop_ssfn_eq_minfree_b nl = invariant nl ==> ssfn nl == minfree nl 
+
+invariant :: [Nat] -> Bool
+invariant = all (>=0)
