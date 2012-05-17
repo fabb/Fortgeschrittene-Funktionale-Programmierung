@@ -2,6 +2,7 @@ module AufgabeFFP7 where
 
 import Test.QuickCheck
 import Data.List
+import Data.Char
 
 -- Assignment 7.1
 {-
@@ -123,6 +124,24 @@ prop_BufferI_left b = retrieve (leftI b) == left (retrieve b)
 prop_BufferI_right b = retrieve (rightI b) == right (retrieve b)
 prop_BufferI_atLeft b = atLeftI b == atLeft (retrieve b)
 prop_BufferI_atRight b = atRightI b == atRight (retrieve b)
+
+instance Arbitrary Char where
+  arbitrary = chr `fmap` oneof [choose (0,127), choose (0,255)]
+  shrink c  = filter (<. c) $ nub
+            $ ['a','b','c']
+           ++ [ toLower c | isUpper c ]
+           ++ ['A','B','C']
+           ++ ['1','2','3']
+           ++ [' ','\n']
+   where
+    a <. b  = stamp a < stamp b
+    stamp a = ( (not (isLower a)
+              , not (isUpper a)
+              , not (isDigit a))
+              , (not (a==' ')
+              , not (isSpace a)
+              , a)
+              )
 
 
 -- Assignment 7.2
