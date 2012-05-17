@@ -82,37 +82,47 @@ atRight (p,s) = p == length s -- cursor is AFTER last char
 type BufferI = (String,String)
 
 emptyI :: BufferI -- the empty BufferI
-emptyI = undefined
+emptyI = ("","")
 
 insertI :: Char -> BufferI -> BufferI -- insert character before cursor
-insertI = undefined
+insertI c (l,r) = (c:l, r)
 
 deleteI :: BufferI -> BufferI -- delete character before cursor
-deleteI = undefined
+deleteI b@(l:ls,r) = (ls, r)
+deleteI b = b
 
 leftI :: BufferI -> BufferI -- move cursor left one character
-leftI = undefined
+leftI (l:ls,r) = (ls,l:r)
+leftI b = b
 
 rightI :: BufferI -> BufferI -- move cursor right one character
-rightI = undefined
+rightI (l,r:rs) = (r:l,rs)
+rightI b = b
 
 atLeftI :: BufferI -> Bool -- is cursor at left end?
-atLeftI = undefined
+atLeftI ([],_) = True
+atLeftI _ = False
 
 atRightI :: BufferI -> Bool -- is cursor at right end?
-atRightI = undefined
+atRightI (_,[]) = True
+atRightI _ = False
 
 
 -- Umwandlung
 
 retrieve :: BufferI -> Buffer
-retrieve = undefined
+retrieve (l,r) = (length l, reverse l ++ r)
 
 
 -- QuickCheck Properties zum Vergleich von Buffer und BufferI
 
-prop_BufferI_XXX = retrieve emptyI == empty
--- TODO more properties, invariants, preconditions, etc.
+prop_BufferI_empty = retrieve emptyI == empty
+prop_BufferI_insert c b = retrieve (insertI c b) == AufgabeFFP7.insert c (retrieve b)
+prop_BufferI_delete b = retrieve (deleteI b) == AufgabeFFP7.delete (retrieve b)
+prop_BufferI_left b = retrieve (leftI b) == left (retrieve b)
+prop_BufferI_right b = retrieve (rightI b) == right (retrieve b)
+prop_BufferI_atLeft b = atLeftI b == atLeft (retrieve b)
+prop_BufferI_atRight b = atRightI b == atRight (retrieve b)
 
 
 -- Assignment 7.2
