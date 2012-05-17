@@ -153,10 +153,11 @@ behandelt werden.
 -}
 
 -- ssfn from lecture
-ssfn :: [Integer] -> Integer
+ssfn :: [Nat] -> Nat
 ssfn = (sap 0) . removeDuplicates . quickSort
 
-removeDuplicates = undefined
+removeDuplicates :: Eq a => [a] -> [a]
+removeDuplicates = nub
 
 -- quickSort from lecture
 quickSort :: Ord a => [a] -> [a]
@@ -177,7 +178,7 @@ divideAndConquer indiv solve divide combine initPb
 				| otherwise = combine pb (map dAC (divide pb))
 
 -- sap from lecture
-sap :: Integer -> [Integer] -> Integer
+sap :: Nat -> [Nat] -> Nat
 sap n [] = 0
 sap n (x:xs)
 	| n /= x = n
@@ -188,15 +189,16 @@ type Nat = Int -- Typ der natürlichen Zahlen beginnend ab 0
 minfree :: [Nat] -> Nat
 minfree xs = head $ ([0..]) \\ xs
 
+
 -- TODO compare function performance
 
 
--- QuickCheck Properties zum Vergleich von Buffer und BufferI
+-- QuickCheck Properties zum Vergleich von ssfn and minfree
 
-prop_ssfn_eq_minfree_a :: Nat -> Bool
-prop_ssfn_eq_minfree_a = undefined
+prop_ssfn_eq_minfree_a :: [Nat] -> Bool
+prop_ssfn_eq_minfree_a nl = ssfn nl == minfree nl 
 
 
 -- Für die Eigenschaft prop ssfn eq minfree b soll durch eine geeignete Vorbedingung sichergestellt werden, dass negative Listenelemente enthaltende automatisch generierte Testfälle verworfen und nicht als gültiger Testfall behandelt werden.
-prop_ssfn_eq_minfree_b :: Nat -> Property
-prop_ssfn_eq_minfree_b = undefined
+prop_ssfn_eq_minfree_b :: [Nat] -> Property
+prop_ssfn_eq_minfree_b nl = undefined
