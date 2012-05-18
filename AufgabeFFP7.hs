@@ -2,6 +2,7 @@ module AufgabeFFP7 where
 
 import Test.QuickCheck
 import Data.List
+import Data.Char
 
 -- Assignment 7.1
 {-
@@ -115,6 +116,10 @@ retrieve (l,r) = (length l, reverse l ++ r)
 
 
 -- QuickCheck Properties zum Vergleich von Buffer und BufferI
+
+instance Arbitrary Char where
+    arbitrary     = choose ('a', 'z')
+    coarbitrary c = variant (ord c `rem` 4)
 
 prop_BufferI_empty = retrieve emptyI == empty
 prop_BufferI_insert c b = retrieve (insertI c b) == AufgabeFFP7.insert c (retrieve b)
