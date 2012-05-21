@@ -230,4 +230,10 @@ prop_allImplsEq_b :: [Int] -> Property
 prop_allImplsEq_b xs = invariant xs ==> checkAllMinfreeEqual xs
 
 invariant :: [Nat] -> Bool
-invariant = all (>=0)
+invariant xs = invariant_positive xs && invariant_nodups xs
+
+invariant_positive :: [Nat] -> Bool
+invariant_positive = all (>=0)
+
+invariant_nodups :: [Nat] -> Bool
+invariant_nodups xs = xs == nub xs
