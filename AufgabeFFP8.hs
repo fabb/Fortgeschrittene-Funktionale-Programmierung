@@ -76,7 +76,7 @@ search_checklist = length . takeWhile id . elems
 checklist :: [Int] -> Array Int Bool
 checklist xs = accumArray (||) False (0,n)
 	(zip (filter (<=n) xs) (repeat True))
-	where n = maximum xs
+	where n = maximum (0:xs)
 
 
 minfree_col :: [Nat] -> Nat -- countlist
@@ -87,7 +87,7 @@ search_countlist = length . takeWhile (/=0) . elems
 
 countlist :: [Int] -> Array Int Int
 countlist xs = accumArray (+) 0 (0,n) (zip xs (repeat 1))
-	where n = maximum xs
+	where n = maximum (0:xs)
 
 --sort_countlist xs = concat [replicate k x | (x,k) <- assocs (countlist xs)]
 
@@ -127,16 +127,78 @@ minfrom_o a (n,xs)
 		m = length us
 
 
-minfree_bhof :: [Nat] -> Nat -- basic divide-and-conquer mittels higher-order function
-minfree_bhof = undefined
+type CheckFor = [Nat]
 
+minfree_bhof :: [Nat] -> Nat -- basic divide-and-conquer mittels higher-order function
+minfree_bhof xs = divideAndConquer b_indiv b_solve b_divide b_combine (xs,[])
+
+b_indiv :: ([Nat],CheckFor) -> Bool
+b_indiv prob@(p,c) = not $ null c
+
+b_solve :: ([Nat],CheckFor) -> Nat
+b_solve prob@(p,c) = head (c \\ p)
+
+b_divide :: ([Nat],CheckFor) -> [([Nat],CheckFor)]
+b_divide prob@(p,c) = if (null (([0..b-1]) \\ us))
+		then [(vs, [b..])]
+		else [(us, [0..])]
+	where
+		(us,vs) = partition (<b) p
+		b = 10 -- any natural number
+
+b_combine :: ([Nat],CheckFor) -> [Nat] -> Nat
+b_combine _ sols = head sols
+
+
+type From = Nat
 
 minfree_rhof :: [Nat] -> Nat -- refined divide-and-conquer mittels higher-order function
-minfree_rhof = undefined
+minfree_rhof prob = divideAndConquer r_indiv r_solve r_divide r_combine (prob,0)
 
+r_indiv :: ([Nat],From) -> Bool
+r_indiv prob@(p,a) = null p
+
+r_solve :: ([Nat],From) -> Nat
+r_solve prob@(p,a) = a
+
+r_divide :: ([Nat],From) -> [([Nat],From)]
+r_divide prob@(p,a) = [newprob]
+	where
+		(us,vs) = partition (<b) p
+		b = a + 1 + (n `div` 2)
+		n = length p
+		newprob = if length us == b-a
+			then (vs,b)
+			else (us,a)
+
+r_combine :: ([Nat],From) -> [Nat] -> Nat
+r_combine _ sols = head sols
+
+
+type Length = Int
 
 minfree_ohof :: [Nat] -> Nat -- optimized divide-and-conquer mittels higher-order function
-minfree_ohof = undefined
+minfree_ohof prob = divideAndConquer o_indiv o_solve o_divide o_combine (prob,0,length prob)
+
+o_indiv :: ([Nat],From,Length) -> Bool
+o_indiv prob@(p,a,n) = n == 0
+
+o_solve :: ([Nat],From,Length) -> Nat
+o_solve prob@(p,a,n) = a
+
+o_divide :: ([Nat],From,Length) -> [([Nat],From,Length)]
+o_divide prob@(p,a,n) = [newprob]
+	where
+		(us,vs) = partition (<b) p
+		b = a + 1 + (n `div` 2)
+		m = length us		
+		newprob = if m == b-a
+			then (vs,b,n-m)
+			else (us,a,m)
+
+o_combine :: ([Nat],From,Length) -> [Nat] -> Nat
+o_combine _ sols = head sols
+
 
 -- HOF from lecture
 divideAndConquer :: (p -> Bool) -> (p -> s) -> (p -> [p]) -> (p -> [s] -> s) -> p -> s
@@ -150,9 +212,22 @@ divideAndConquer indiv solve divide combine initPb
 
 -- QuickCheck Properties zum Vergleich der 9 Implementierungen
 
+allEqual :: Eq a => [a] -> Bool
+allEqual [] = undefined
+allEqual xs = all (== head xs) $ tail xs
+
+allMinfree :: [Nat] -> [Nat]
+allMinfree xs = map (\f -> f xs) [minfree_bv, minfree_chl, minfree_col, minfree_b, minfree_r, minfree_o, minfree_bhof, minfree_rhof, minfree_ohof]
+
+checkAllMinfreeEqual :: [Nat] -> Bool
+checkAllMinfreeEqual = allEqual . allMinfree
+
 prop_allImplsEq_a :: [Int] -> Bool
-prop_allImplsEq_a = undefined
+prop_allImplsEq_a = checkAllMinfreeEqual
 
 -- Für die Eigenschaft prop allImplsEq b soll durch eine geeignete Vorbedingung sichergestellt werden, dass negative Listenelemente enthaltende automatisch generierte Testfälle verworfen und nicht als gültiger Testfall behandelt werden.
 prop_allImplsEq_b :: [Int] -> Property
-prop_allImplsEq_b = undefined
+prop_allImplsEq_b xs = invariant xs ==> checkAllMinfreeEqual xs
+
+invariant :: [Nat] -> Bool
+invariant = all (>=0)
