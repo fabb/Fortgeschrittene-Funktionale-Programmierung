@@ -3,6 +3,7 @@ module AufgabeFFP9 where
 import Test.QuickCheck
 import AufgabeFFP5
 import Array
+import Data.List
 
 
 -- Assignment 9.1
@@ -138,7 +139,107 @@ mus zur Lösung von Sudoku-Puzzles entwickelt. Erweitern Sie diese Lösung so,
 dass Sie zur Lösung von Samurai-Puzzles verwendet werden kann.
 -}
 
--- function description
-f2 :: a -> b
-f2 = undefined
+sudoku1 = [
+	['0','5','0','0','6','0','0','0','1'],
+	['0','0','4','8','0','0','0','7','0'],
+	['8','0','0','0','0','0','0','5','2'],
+	['2','0','0','0','5','7','0','3','0'],
+	['0','0','0','0','0','0','0','0','0'],
+	['0','3','0','6','9','0','0','0','5'],
+	['7','9','0','0','0','0','0','0','8'],
+	['0','1','0','0','0','6','5','0','0'],
+	['5','0','0','0','3','0','0','6','0']
+	]
 
+sudoku2 = [
+	['0','0','0','0','6','0','0','8','0'],
+	['0','2','0','0','0','0','0','0','0'],
+	['0','0','1','0','0','0','0','0','0'],
+	['0','7','0','0','0','0','1','0','2'],
+	['5','0','0','0','3','0','0','0','0'],
+	['0','0','0','0','0','0','4','0','0'],
+	['0','0','4','2','0','1','0','0','0'],
+	['3','0','0','7','0','0','6','0','0'],
+	['0','0','0','0','0','0','0','5','0']
+	]
+
+
+solve = search . choices
+search m
+	| not (safe m) = []
+	| complete m' = [map (map head) m']
+	| otherwise = concat (map search (expand1 m'))
+		where m' = prune m
+
+type Matrix a = [Row a]
+type Row a = [a]
+type Grid = Matrix Digit
+type Digit = Char
+
+digits = ['1'..'9']
+blank = (== '0')
+
+type Choices = [Digit]
+
+choices :: Grid -> Matrix Choices
+choices = map (map choice)
+choice d = if blank d then digits else [d]
+
+valid :: Grid -> Bool
+valid g = all nodups (rows g) && all nodups (cols g) && all nodups (boxs g)
+
+nodups :: Eq a => [a] -> Bool
+nodups [] = True
+nodups (x:xs) = all (/= x) xs && nodups xs
+
+rows :: Matrix a -> Matrix a
+rows = id
+
+cols :: Matrix a -> Matrix a
+cols [xs] = [ [x] | x <- xs]
+cols (xs:xss) = zipWith (:) xs (cols xss)
+
+boxs :: Matrix a -> Matrix a
+boxs = map ungroup . ungroup . map cols . groupS . map groupS
+
+groupS :: [a] -> [[a]]
+groupS [] = []
+groupS xs = take 3 xs : groupS (drop 3 xs)
+
+ungroup :: [[a]] -> [a]
+ungroup = concat
+
+pruneRow :: Row Choices -> Row Choices
+pruneRow row = map (remove fixed) row
+	where
+		fixed = [d | [d] <- row]
+		remove xs ds = if singleton ds then ds else ds \\ xs
+			where
+				singleton [_] = True
+				singleton _ = False
+
+pruneBy f = f . map pruneRow . f
+
+prune :: Matrix Choices -> Matrix Choices
+prune = pruneBy boxs . pruneBy cols . pruneBy rows
+
+expand1 :: Matrix Choices -> [Matrix Choices]
+expand1 rows = [rows1 ++ [row1 ++ [c] : row2] ++ rows2 | c<-cs]
+	where
+	(rows1,row:rows2) = break (any smallest) rows
+	(row1, cs:row2) = break smallest row
+	smallest cs = length cs == n
+	n = minimum (counts rows)
+	counts = filter (/=1) . map length . concat
+	break p xs = (takeWhile (not . p) xs, dropWhile (not . p) xs)
+
+complete = all (all single)
+	where
+		single [_] = True
+		single _ = False
+
+safe m = all ok (rows m) &&
+	all ok (cols m) &&
+	all ok (boxs m)
+		where
+			ok row = nodups [d | [d] <- row]
