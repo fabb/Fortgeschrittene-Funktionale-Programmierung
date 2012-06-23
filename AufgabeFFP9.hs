@@ -19,12 +19,24 @@ Aufgabenblatt 5.
 mss [] = error "Minus Infinity"
 mss [x] = x
 mss [x,y] = maximum [x,y,x+y]
-mss xs = (\(_,s,c,_) -> max s c) (foldl h (start (take 3 xs)) (drop 3 xs))
-start [x,y,z] = (0, maximum [x+y+z,y+z,z], maximum [x,x+y,y], x+z)
-h (e, s, c, f) x = (e, (max s e)+x, max c s, max f ((max f c) + x))
+mss xs = (\(s,c) -> max s c) (foldl h (start (take 3 xs)) (drop 3 xs))
+start [x,y,z] = (maximum [x+y+z,y+z,z], maximum [x,x+y,y])
+h (s, c) x = (if s>0 then s+x else x, max c s)
 
 
 -- History below
+
+{-
+mss xs = (\(_,s,c) -> max s c) (foldl h (start (take 3 xs)) (drop 3 xs))
+start [x,y,z] = (0, maximum [x+y+z,y+z,z], maximum [x,x+y,y])
+h (e, s, c) x = (e, (max s e)+x, max c s)
+-}
+
+{-
+mss xs = (\(_,s,c,_) -> max s c) (foldl h (start (take 3 xs)) (drop 3 xs))
+start [x,y,z] = (0, maximum [x+y+z,y+z,z], maximum [x,x+y,y], x+z)
+h (e, s, c, f) x = (e, (max s e)+x, max c s, max f ((max f c) + x))
+-}
 
 --mss = (\(_,s,c,_) -> max s c) . foldl h (0, minusInfty,minusInfty,minusInfty)
 --minusInfty = -10000000000000000000000000000000000000000
