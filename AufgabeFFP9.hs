@@ -235,8 +235,8 @@ expand1 sudokus = [sudokus1 ++ [rows1 ++ [row1 ++ [c] : row2] ++ rows2] ++ sudok
 	(rows1,row:rows2) = break (any smallest) rows
 	(row1, cs:row2) = break smallest row
 	smallest cs = length cs == n
-	n = minimum (counts rows)
-	counts = filter (/=1) . map length . concat
+	n = minimum (counts sudokus)
+	counts = filter (/=1) . map length . concat . concat
 	break p xs = (takeWhile (not . p) xs, dropWhile (not . p) xs)
 
 complete :: SamuraiMatrix Choices -> Bool
