@@ -1,5 +1,6 @@
 module AufgabeFFP9 where
 
+import AufgabeFFP9_Sudokus
 import Test.QuickCheck
 import AufgabeFFP5
 import Array
@@ -139,38 +140,16 @@ mus zur Lösung von Sudoku-Puzzles entwickelt. Erweitern Sie diese Lösung so,
 dass Sie zur Lösung von Samurai-Puzzles verwendet werden kann.
 -}
 
-sudoku1 = [
-	['0','5','0','0','6','0','0','0','1'],
-	['0','0','4','8','0','0','0','7','0'],
-	['8','0','0','0','0','0','0','5','2'],
-	['2','0','0','0','5','7','0','3','0'],
-	['0','0','0','0','0','0','0','0','0'],
-	['0','3','0','6','9','0','0','0','5'],
-	['7','9','0','0','0','0','0','0','8'],
-	['0','1','0','0','0','6','5','0','0'],
-	['5','0','0','0','3','0','0','6','0']
-	]
-
-sudoku2 = [
-	['0','0','0','0','6','0','0','8','0'],
-	['0','2','0','0','0','0','0','0','0'],
-	['0','0','1','0','0','0','0','0','0'],
-	['0','7','0','0','0','0','1','0','2'],
-	['5','0','0','0','3','0','0','0','0'],
-	['0','0','0','0','0','0','4','0','0'],
-	['0','0','4','2','0','1','0','0','0'],
-	['3','0','0','7','0','0','6','0','0'],
-	['0','0','0','0','0','0','0','5','0']
-	]
-
-
 solve = search . choices
+
 search m
-	| not (safe m) = []
-	| complete m' = [map (map head) m']
+	| not (safeSamurai m) = []
+	| complete m' = [map (map (map head)) m']
 	| otherwise = concat (map search (expand1 m'))
 		where m' = prune m
 
+type SamuraiMatrix a = [Matrix a] -- order is top-left, top-right, bottom-right, bottom-left, middle
+type SamuraiGrid = [Grid] -- order is top-left, top-right, bottom-right, bottom-left, middle
 type Matrix a = [Row a]
 type Row a = [a]
 type Grid = Matrix Digit
@@ -181,12 +160,17 @@ blank = (== '0')
 
 type Choices = [Digit]
 
-choices :: Grid -> Matrix Choices
-choices = map (map choice)
+choices :: SamuraiGrid -> SamuraiMatrix Choices
+choices = map (map (map choice))
 choice d = if blank d then digits else [d]
 
+validSamurai :: SamuraiGrid -> Bool
+validSamurai = all valid
+
 valid :: Grid -> Bool
-valid g = all nodups (rows g) && all nodups (cols g) && all nodups (boxs g)
+valid g = all nodups0 (rows g) && all nodups0 (cols g) && all nodups0 (boxs g)
+	where
+		nodups0 = nodups . filter (not . blank)
 
 nodups :: Eq a => [a] -> Bool
 nodups [] = True
@@ -220,12 +204,34 @@ pruneRow row = map (remove fixed) row
 
 pruneBy f = f . map pruneRow . f
 
-prune :: Matrix Choices -> Matrix Choices
-prune = pruneBy boxs . pruneBy cols . pruneBy rows
+prune :: SamuraiMatrix Choices -> SamuraiMatrix Choices
+prune = repairSamuraiMatrix . map (pruneBy boxs . pruneBy cols . pruneBy rows)
+-- warning: samurai data structure contains duplicated boxes due to overlapping in samurai sudoku
+-- these duplicated boxes must be cross updated afterwards
 
-expand1 :: Matrix Choices -> [Matrix Choices]
-expand1 rows = [rows1 ++ [row1 ++ [c] : row2] ++ rows2 | c<-cs]
+repairSamuraiMatrix :: SamuraiMatrix Choices -> SamuraiMatrix Choices
+repairSamuraiMatrix = map boxs . crossupdate . map boxs
 	where
+		crossupdate :: SamuraiMatrix Choices -> SamuraiMatrix Choices
+		crossupdate sm@[s1,s2,s3,s4,s5] =
+			[
+				take 8 s1 ++ [boxtopleft sm],
+				take 6 s2 ++ [boxtopright sm] ++ drop 7 s2,
+				[boxbottomright sm] ++ drop 1 s3,
+				take 2 s4 ++ [boxbottomleft sm] ++ drop 3 s4,
+				[boxtopleft sm] ++ (take 1 . drop 1) s5 ++ [boxtopright sm] ++ (take 3 . drop 3) s5 ++ [boxbottomleft sm] ++ (take 1 . drop 7) s5 ++ [boxbottomright sm]
+			]
+
+		boxtopleft sm     = intersectChoices (sm!!0!!8,sm!!4!!0)
+		boxtopright sm    = intersectChoices (sm!!1!!6,sm!!4!!2)
+		boxbottomright sm = intersectChoices (sm!!2!!0,sm!!4!!8)
+		boxbottomleft sm  = intersectChoices (sm!!3!!2,sm!!4!!6)
+		intersectChoices = uncurry (zipWith intersect)
+
+expand1 :: SamuraiMatrix Choices -> [SamuraiMatrix Choices]
+expand1 sudokus = [sudokus1 ++ [rows1 ++ [row1 ++ [c] : row2] ++ rows2] ++ sudokus2 | c<-cs]
+	where
+	(sudokus1,rows:sudokus2) = break (any (any smallest)) sudokus
 	(rows1,row:rows2) = break (any smallest) rows
 	(row1, cs:row2) = break smallest row
 	smallest cs = length cs == n
@@ -233,11 +239,16 @@ expand1 rows = [rows1 ++ [row1 ++ [c] : row2] ++ rows2 | c<-cs]
 	counts = filter (/=1) . map length . concat
 	break p xs = (takeWhile (not . p) xs, dropWhile (not . p) xs)
 
-complete = all (all single)
+complete :: SamuraiMatrix Choices -> Bool
+complete = all (all (all single))
 	where
 		single [_] = True
 		single _ = False
 
+safeSamurai :: SamuraiMatrix Choices -> Bool
+safeSamurai = all safe
+
+safe :: Matrix Choices -> Bool
 safe m = all ok (rows m) &&
 	all ok (cols m) &&
 	all ok (boxs m)
